@@ -1,0 +1,48 @@
+{
+	"browserslist": {
+		"production": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"dependencies": {
+		"@sentry/integrations": "^7.9.0",
+		"@sentry/react": "^7.5.1",
+		"@sentry/tracing": "^7.5.1",
+		"axios": "^0.27.2",
+		"draft-js": "^0.11.7",
+		"html-to-image": "^1.10.8",
+		"js-cookie": "^3.0.1",
+		"react": "^17.0.2",
+		"react-angle-range": "https://github.com/carlos-adra/react-angle-range/tarball/master",
+		"react-dom": "^17.0.2",
+		"react-draggable": "^4.4.4",
+		"react-measurements": "https://github.com/houchongchan/react-measurements/tarball/main",
+		"react-measurements-bone-level": "https://github.com/houchongchan/react-measurements-bone-level/tarball/update-branch-1",
+		"react-multi-carousel": "^2.8.0",
+		"react-scripts": "^4.0.3",
+		"react-shape-editor": "^4.1.1",
+		"react-sketch-canvas": "^6.1.0",
+		"react-slider": "^1.3.1",
+		"react-zoom-pan-pinch": "https://github.com/carlos-adra/react-zoom-pan-pinch/tarball/master",
+		"smartlook-client": "^7.0.1",
+		"styled-components": "^5.0.0",
+		"uuid": "^8.3.2",
+		"web-vitals": "^2.1.4"
+	},
+	"scripts": {
+		"start": "react-scripts start",
+		"build": "GENERATE_SOURCEMAP=false react-scripts build"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.20.1",
+		"nodemon": "^2.0.15",
+		"playwright-webkit": "^1.20.1"
+	}
+}
