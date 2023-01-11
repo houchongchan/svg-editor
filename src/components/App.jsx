@@ -60,14 +60,6 @@ const Container = styled.div`
 	position: relative;
 `;
 
-const Left = styled.div`
-	display: flex;
-	flex-direction: column;
-	margin: 0px;
-	position: relative;
-	width: 100%;
-`;
-
 const ModalContainer = styled.div`
 	align-items: center;
 	background: rgba(0, 0, 0, 0.5);
@@ -77,13 +69,6 @@ const ModalContainer = styled.div`
 	position: absolute;
 	width: 100vw;
 	z-index: 105;
-`;
-
-const Right = styled.div`
-	display: flex;
-	margin-right: 4px;
-	position: relative;
-	right: 0px;
 `;
 
 const View = styled.div`

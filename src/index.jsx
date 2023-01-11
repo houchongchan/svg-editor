@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
 import "./globals.css";
-import DiagnosticsView from "./components/DiagnosticsView";
+import App from "./components/App";
 
-ReactDOM.render(<DiagnosticsView />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById("root"));
