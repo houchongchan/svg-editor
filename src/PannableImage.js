@@ -1,19 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-// import SVG from "../SVG";
-// import Segment from "../Segment";
 import LineMeasurement from "./LineMeasurement";
 import { initial } from "./Config";
 
 const PannableImage = ({ src }) => {
-	// https://jkettmann.com/jr-to-sr-refactoring-react-pan-and-zoom-image-component
-	const [isPanning, setPanning] = useState(false);
-	const [mode, setMode] = useState("pan");
+	const [panning, setPanning] = useState(false);
+	const [mode, setMode] = useState("image");
 	const [image, setImage] = useState({
 		width: 0,
 		height: 0,
 	});
-	const [cursor, setCursor] = useState({ x: 0, y: 0 });
 	const [position, setPosition] = useState({
 		oldX: 0,
 		oldY: 0,
@@ -23,6 +19,7 @@ const PannableImage = ({ src }) => {
 	});
 	const [lines, setLines] = useState(initial);
 
+	const cursorRef = useRef({ x: 0, y: 0 });
 	const containerRef = useRef();
 
 	const onLoad = (e) => {
@@ -33,7 +30,7 @@ const PannableImage = ({ src }) => {
 	};
 
 	const onMouseDown = (e) => {
-		if (mode !== "pan") {
+		if (mode !== "image") {
 			return;
 		}
 
@@ -47,7 +44,7 @@ const PannableImage = ({ src }) => {
 	};
 
 	const onWheel = (e) => {
-		if (mode !== "pan") {
+		if (mode !== "image") {
 			return;
 		}
 
@@ -69,7 +66,7 @@ const PannableImage = ({ src }) => {
 	};
 
 	useEffect(() => {
-		if (mode !== "pan") {
+		if (mode !== "image") {
 			return;
 		}
 
@@ -78,7 +75,7 @@ const PannableImage = ({ src }) => {
 		};
 
 		const mousemove = (event) => {
-			if (isPanning) {
+			if (panning) {
 				setPosition({
 					...position,
 					x: position.x + event.clientX - position.oldX,
@@ -105,7 +102,9 @@ const PannableImage = ({ src }) => {
 
 	return (
 		<Container
-			onMouseMove={(event) => setCursor({ x: event.clientX, y: event.clientY })}
+			onMouseMove={(event) =>
+				(cursorRef.current = { x: event.clientX, y: event.clientY })
+			}
 			ref={containerRef}
 			onMouseDown={onMouseDown}
 			onWheel={onWheel}
@@ -119,25 +118,22 @@ const PannableImage = ({ src }) => {
 					alt="pollen"
 					src={src}
 					onLoad={onLoad}
-					onMouseDown={() => setMode("pan")}
+					onMouseDown={() => setMode("image")}
 				/>
 				{lines &&
 					lines.map((e) => {
 						return (
 							<LineMeasurement
-								lines={lines}
 								onModeChange={(e) => setMode(e)}
-								x={cursor.x}
-								y={cursor.y}
+								x={cursorRef.current.x}
+								y={cursorRef.current.y}
 								doubleClicked={false}
 								key={e.id}
 								line={e}
 								parentWidth={image.width}
 								parentHeight={image.height}
 								measureLine={() => {}}
-								onDoubleClick={() => {}}
 								onChange={(e) => onChange(e)}
-								onCommit={() => {}}
 								onDeleteButtonClick={() => {}}
 								onMidMouse={() => {}}
 								onLabelClick={() => {}}
@@ -155,11 +151,14 @@ const PannableImage = ({ src }) => {
 
 export default PannableImage;
 
-const Container = styled.div``;
+const Container = styled.div`
+	background: rgba(0, 255, 255, 0.5);
+	overflow: hidden;
+`;
 
 const Pannable = styled.div`
 	position: relative;
 `;
 const Image = styled.img`
-	opacity: 0.2;
+	opacity: 0.5;
 `;

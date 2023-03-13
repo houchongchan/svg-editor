@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import React from "react";
 import { useRef } from "react";
 import InputAnchor from "./InputAnchor";
 import { useState } from "react";
@@ -7,7 +8,7 @@ const edgeLength = 15;
 const textOffset = 16;
 const quarterCircle = Math.PI / 2;
 
-export default function LineMeasurement(props) {
+function LineMeasurement(props) {
 	const {
 		onModeChange,
 		x,
@@ -17,7 +18,6 @@ export default function LineMeasurement(props) {
 		parentHeight,
 		measureLine,
 		onChange,
-		onCommit,
 		onMidMouse,
 		onInput,
 		onInputClick,
@@ -28,7 +28,6 @@ export default function LineMeasurement(props) {
 	const startDragInProgress = useRef(false);
 	const endDragInProgress = useRef(false);
 	const midDragInProgress = useRef(false);
-	const dragOccurred = useRef(false);
 
 	const mouseXAtPress = useRef();
 	const mouseYAtPress = useRef();
@@ -68,9 +67,6 @@ export default function LineMeasurement(props) {
 	};
 
 	const onStartMouseDown = (event) => {
-		if (doubleClick) {
-			return;
-		}
 		if (event.button === 0) {
 			onModeChange("line");
 			startDragInProgress.current = true;
@@ -89,9 +85,6 @@ export default function LineMeasurement(props) {
 	};
 
 	const onEndMouseDown = (event) => {
-		if (doubleClick) {
-			return;
-		}
 		if (event.button === 0) {
 			onModeChange("line");
 			endDragInProgress.current = true;
@@ -112,21 +105,10 @@ export default function LineMeasurement(props) {
 	};
 
 	const onMouseMove = (x, y) => {
-		if (doubleClick) {
-			return;
-		}
 		onDrag(x, y);
 	};
 
 	const onDrag = (eventX, eventY) => {
-		if (
-			(startDragInProgress.current ||
-				endDragInProgress.current ||
-				midDragInProgress.current) &&
-			!dragOccurred.current
-		) {
-			dragOccurred.current = true;
-		}
 		if (startDragInProgress.current) {
 			const startX = clamp(getXAfterDrag(startXAtPress, eventX));
 			const startY = clamp(getYAfterDrag(startYAtPress, eventY));
@@ -192,23 +174,10 @@ export default function LineMeasurement(props) {
 		(yAtPress.current + clientY - mouseYAtPress.current) / parentHeight;
 
 	const onMouseUp = (event) => {
-		if (doubleClick) {
-			return;
-		}
 		endDrag();
 	};
 
 	const endDrag = () => {
-		if (doubleClick) {
-			return;
-		}
-		if (dragOccurred) {
-			dragOccurred.current = false;
-		}
-		const anyDragAttempted =
-			startDragInProgress.current ||
-			midDragInProgress.current ||
-			endDragInProgress.current;
 		if (startDragInProgress.current) {
 			startDragInProgress.current = false;
 		}
@@ -217,31 +186,16 @@ export default function LineMeasurement(props) {
 		}
 		if (endDragInProgress) {
 			endDragInProgress.current = false;
-			onModeChange("pan");
-		}
-		if (anyDragAttempted && didValuesChange()) {
-			onCommit(line);
+			onModeChange("image");
 		}
 		setClicked(false);
 	};
 
-	const didValuesChange = () =>
-		line.startX !== lineAtPress.current.startX ||
-		line.startY !== lineAtPress.current.startY ||
-		line.endX !== lineAtPress.current.endX ||
-		line.endY !== lineAtPress.current.endY;
-
 	const onMidMouseEnter = (event) => {
-		if (doubleClick) {
-			return;
-		}
 		onMidMouse("enter");
 	};
 
 	const onMidMouseLeave = (event) => {
-		if (doubleClick) {
-			return;
-		}
 		onMidMouse("leave");
 	};
 
@@ -337,6 +291,8 @@ export default function LineMeasurement(props) {
 		</Container>
 	);
 }
+
+export default React.memo(LineMeasurement);
 
 const Container = styled.div.attrs((props) => ({
 	style: {
