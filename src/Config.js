@@ -1,5 +1,5 @@
 module.exports = {
-	initial: [
+	initialLine: [
 		{
 			id: 0,
 			type: "line",
@@ -21,7 +21,7 @@ module.exports = {
 			number: 21,
 		},
 	],
-	initial2: [
+	initialRect: [
 		{
 			AI: 0.4,
 			id: 1,
