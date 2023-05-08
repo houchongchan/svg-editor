@@ -65,7 +65,7 @@ const PannableImage = ({ src }) => {
 		if (e.deltaY) {
 			const sign = Math.sign(e.deltaY) / 10;
 			const scale = 1 - sign;
-			// console.log(sign, scale, e);
+
 			setDimensions({ sign: sign, scale: 1 - sign });
 			const rect = containerRef.current.getBoundingClientRect();
 
@@ -78,12 +78,9 @@ const PannableImage = ({ src }) => {
 						sign,
 				z: position.z * scale,
 			});
-
 			setScale(scale);
-			// console.log(cursorRef.current);
 		}
 	};
-	// console.log(cursorRef.current);
 
 	const onChange = (m) => {
 		const tmp = lines.filter((x) => x.id !== m.id);
@@ -112,7 +109,7 @@ const PannableImage = ({ src }) => {
 				}}
 			>
 				<Image
-					alt="pollen"
+					alt="image"
 					src={src}
 					onLoad={onLoad}
 					draggable={false}
