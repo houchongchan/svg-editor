@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import React from "react";
 import { useRef } from "react";
+// import InputAnchor from "./InputAnchor";
 import { useState } from "react";
 
 const edgeLength = 15;
@@ -9,6 +10,9 @@ const quarterCircle = Math.PI / 2;
 
 function LineMeasurement(props) {
 	const {
+		selected,
+		onSelected,
+		onModeChange,
 		x,
 		y,
 		line,
@@ -81,6 +85,7 @@ function LineMeasurement(props) {
 
 	const onDragBegin = (eventX, eventY) => {
 		setClicked(true);
+		onSelected(`line${line.id}`);
 		mouseXAtPress.current = eventX;
 		mouseYAtPress.current = eventY;
 		lineAtPress.current = line;
@@ -91,6 +96,7 @@ function LineMeasurement(props) {
 	};
 
 	const onMouseMove = (x, y) => {
+		if (!clicked) return;
 		onDrag(x, y);
 	};
 
@@ -98,6 +104,7 @@ function LineMeasurement(props) {
 		if (startDragInProgress.current) {
 			const startX = clamp(getXAfterDrag(startXAtPress, eventX));
 			const startY = clamp(getYAfterDrag(startYAtPress, eventY));
+			console.log(startX, startY);
 			onChange({ ...line, startX, startY });
 		} else if (endDragInProgress.current) {
 			const endX = clamp(getXAfterDrag(endXAtPress, eventX));
@@ -154,6 +161,7 @@ function LineMeasurement(props) {
 	};
 
 	const endDrag = () => {
+		if (!clicked) return;
 		if (startDragInProgress.current) {
 			startDragInProgress.current = false;
 		}
@@ -188,7 +196,7 @@ function LineMeasurement(props) {
 
 	return (
 		<Container
-			onMouseMove={() => onMouseMove(x, y)}
+			onMouseMove={(e) => onMouseMove(e.clientX, e.clientY)}
 			onMouseUp={onMouseUp}
 			onBlur={endDrag}
 			width={parentWidth}
@@ -196,7 +204,7 @@ function LineMeasurement(props) {
 			dragging={clicked}
 		>
 			<SVG>
-				<G>
+				<G selected={selected == "" || selected == `line${line.id}`}>
 					<MidGrabber
 						x1={startX}
 						y1={startY}
@@ -208,7 +216,7 @@ function LineMeasurement(props) {
 					/>
 					<Line x1={startX} y1={startY} x2={endX} y2={endY} />
 				</G>
-				<G>
+				<G selected={selected == "" || selected == `line${line.id}`}>
 					<Grabber
 						x1={startX - edgeX}
 						y1={startY + edgeY}
@@ -220,7 +228,7 @@ function LineMeasurement(props) {
 					/>
 					<Circle cx={startX} cy={startY} r={4} />
 				</G>
-				<G>
+				<G selected={selected == "" || selected == `line${line.id}`}>
 					<Grabber
 						x1={endX - edgeX}
 						y1={endY + edgeY}
@@ -233,6 +241,19 @@ function LineMeasurement(props) {
 					<Circle cx={endX} cy={endY} r={4} />
 				</G>
 			</SVG>
+			{/* <InputAnchor
+				x={textX}
+				y={textY}
+				rotate={textRotate}
+				onLabelClick={onLabelClick}
+				onNumberChange={onNumberChange}
+				onDeleteButtonClick={onDeleteButtonClick}
+				label={line.label}
+				number={line.number}
+				onInput={onInput}
+				onInputClick={onInputClick}
+				onInputBlur={onInputBlur}
+			/> */}
 		</Container>
 	);
 }
@@ -281,5 +302,5 @@ const Line = styled.line`
 `;
 
 const G = styled.g`
-	pointer-events: auto;
+	pointer-events: ${(props) => (props.selected ? "auto" : "none")};
 `;

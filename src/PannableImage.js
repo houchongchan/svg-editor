@@ -4,6 +4,7 @@ import styled from "styled-components";
 import LineMeasurement from "./LineMeasurement";
 import { initialLine, initialRect } from "./Config";
 import { useMovingAndScaling } from "./useMovingAndScaling";
+import { initial, initial2 } from "./Config";
 
 const PannableImage = ({ src }) => {
 	const [panning, setPanning] = useState(false);
@@ -22,6 +23,10 @@ const PannableImage = ({ src }) => {
 	const [lines, setLines] = useState(initialLine);
 
 	const [rectangles, setRectangles] = useState(initialRect);
+	const [selected, setSelected] = useState("");
+	const [dimensions, setDimensions] = useState({ sign: 0, scale: 1 });
+	const [scale, setScale] = useState(1);
+	const [mode, setMode] = useState("");
 
 	const cursorRef = useRef({ x: 0, y: 0 });
 	const containerRef = useRef();
@@ -51,12 +56,34 @@ const PannableImage = ({ src }) => {
 	};
 
 	const onMouseMove = (e) => {
+		setSelected("");
 		cursorRef.current = { x: e.clientX, y: e.clientY };
 
 		if (!panning) return;
 
 		onPan(e);
+		if (e.deltaY) {
+			const sign = Math.sign(e.deltaY) / 10;
+			const scale = 1 - sign;
+			// console.log(sign, scale, e);
+			setDimensions({ sign: sign, scale: 1 - sign });
+			const rect = containerRef.current.getBoundingClientRect();
+
+			setPosition({
+				...position,
+				x: position.x * scale - (rect.width / 2 - e.clientX + rect.x) * sign,
+				y:
+					position.y * scale -
+					((image.height * rect.width) / image.width / 2 - e.clientY + rect.y) *
+						sign,
+				z: position.z * scale,
+			});
+
+			setScale(scale);
+			// console.log(cursorRef.current);
+		}
 	};
+	// console.log(cursorRef.current);
 
 	const onChange = (m) => {
 		const tmp = lines.filter((x) => x.id !== m.id);
@@ -90,39 +117,49 @@ const PannableImage = ({ src }) => {
 					onLoad={onLoad}
 					draggable={false}
 					data-pannable
+					onMouseDown={() => setMode("image")}
+					parentWidth={image.width}
+					parentHeight={image.height}
 				/>
 				{lines &&
 					lines.map((e) => {
 						return (
 							<LineMeasurement
+								onSelected={() => setSelected(`line${e.id}`)}
+								selected={selected}
+								onModeChange={(e) => setMode(e)}
 								x={cursorRef.current.x}
 								y={cursorRef.current.y}
-								doubleClicked={false}
 								key={e.id}
 								line={e}
 								parentWidth={image.width}
 								parentHeight={image.height}
 								measureLine={() => {}}
 								onChange={(e) => onChange(e)}
-								onDeleteButtonClick={() => {}}
 								onMidMouse={() => {}}
 								onLabelClick={() => {}}
 								onNumberChange={() => {}}
 							/>
 						);
 					})}
-
 				{rectangles &&
 					rectangles.map((e) => {
 						return (
 							<BoxMarker
 								rectangle={e}
+								onSelected={() => setSelected(`box${e.id}`)}
+								selected={selected}
+								onModeChange={(e) => setMode(e)}
 								x={cursorRef.current.x}
 								y={cursorRef.current.y}
 								key={e.id}
 								parentWidth={image.width}
 								parentHeight={image.height}
 								onChange={(e) => onChange2(e)}
+								onMidMouse={() => {}}
+								onInput={() => {}}
+								onInputClick={() => {}}
+								onInputBlur={() => {}}
 							/>
 						);
 					})}
@@ -144,4 +181,7 @@ const Pannable = styled.div`
 `;
 const Image = styled.img`
 	opacity: 0.5;
+	width ${(props) => props.parentWidth}px;
+	height ${(props) => props.parentHeight}px;
+	
 `;

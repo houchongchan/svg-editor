@@ -1,11 +1,29 @@
 import styled from "styled-components";
 import { useRef } from "react";
+import InputAnchor from "./InputAnchor";
 import React from "react";
 import { useState } from "react";
 
+const edgeLength = 15;
+const textOffset = 16;
+const quarterCircle = Math.PI / 2;
+
 function BoxMarker(props) {
-	const { selected, x, y, rectangle, parentWidth, parentHeight, onChange } =
-		props;
+	const {
+		onSelected,
+		selected,
+		onModeChange,
+		x,
+		y,
+		rectangle,
+		parentWidth,
+		parentHeight,
+		onChange,
+		onMidMouse,
+		onInput,
+		onInputClick,
+		onInputBlur,
+	} = props;
 	const [clicked, setClicked] = useState(false);
 	const topDragInProgress = useRef(false);
 	const bottomDragInProgress = useRef(false);
@@ -24,6 +42,7 @@ function BoxMarker(props) {
 
 	const onStartMouseDown = (event, direction) => {
 		if (event.button === 0) {
+			onModeChange("box");
 			if (direction === 1 || direction === 5 || direction === 6) {
 				topDragInProgress.current = true;
 			}
@@ -43,6 +62,7 @@ function BoxMarker(props) {
 
 	const onMidMouseDown = (event) => {
 		if (event.button === 0) {
+			onModeChange("box");
 			midDragInProgress.current = true;
 			event.preventDefault();
 			onDragBegin(event.clientX, event.clientY);
@@ -71,6 +91,7 @@ function BoxMarker(props) {
 
 	const onMouseMove = (x, y) => {
 		if (!clicked) return;
+		onSelected();
 		onDrag(x, y);
 	};
 
@@ -205,7 +226,26 @@ function BoxMarker(props) {
 		if (midDragInProgress) {
 			midDragInProgress.current = false;
 		}
+		onModeChange("image");
 		setClicked(false);
+	};
+
+	// const onDeleteButtonClick = () => onDeleteButtonClick(line);
+
+	// const onLabelClick = () => {
+	// 	onLabelClick(line);
+	// };
+
+	// const onNumberChange = (e) => {
+	// 	onNumberChange(line, e);
+	// };
+
+	const onMouseEnter = () => {
+		onModeChange("box");
+	};
+
+	const onMouseLeave = () => {
+		onModeChange("image");
 	};
 
 	return (
@@ -225,6 +265,8 @@ function BoxMarker(props) {
 						width={rectangle.box.width}
 						height={rectangle.box.height}
 						onMouseDown={onMidMouseDown}
+						// onMouseEnter={onMouseEnter}
+						// onMouseLeave={onMouseLeave}
 					/>
 				</G>
 				<G selected={selected == "" || selected == `box${rectangle.id}`}>
@@ -234,8 +276,11 @@ function BoxMarker(props) {
 						x2={rectangle.box.x + rectangle.box.width}
 						y2={rectangle.box.y}
 						onMouseDown={(e) => onStartMouseDown(e, 1)}
+						// onMouseEnter={onMouseEnter}
+						// onMouseLeave={onMouseLeave}
 					/>
 					<Line
+						// style={colorStyle}
 						x1={rectangle.box.x}
 						y1={rectangle.box.y}
 						x2={rectangle.box.x + rectangle.box.width}
@@ -249,8 +294,11 @@ function BoxMarker(props) {
 						x2={rectangle.box.x}
 						y2={rectangle.box.y + rectangle.box.height}
 						onMouseDown={(e) => onStartMouseDown(e, 2)}
+						// onMouseEnter={onMouseEnter}
+						// onMouseLeave={onMouseLeave}
 					/>
 					<Line
+						// style={colorStyle}
 						x1={rectangle.box.x}
 						y1={rectangle.box.y}
 						x2={rectangle.box.x}
@@ -264,8 +312,11 @@ function BoxMarker(props) {
 						x2={rectangle.box.x + rectangle.box.width}
 						y2={rectangle.box.y + rectangle.box.height}
 						onMouseDown={(e) => onStartMouseDown(e, 3)}
+						// onMouseEnter={onMouseEnter}
+						// onMouseLeave={onMouseLeave}
 					/>
 					<Line
+						// style={colorStyle}
 						x1={rectangle.box.x + rectangle.box.width}
 						y1={rectangle.box.y}
 						x2={rectangle.box.x + rectangle.box.width}
@@ -279,8 +330,11 @@ function BoxMarker(props) {
 						x2={rectangle.box.x + rectangle.box.width}
 						y2={rectangle.box.y + rectangle.box.height}
 						onMouseDown={(e) => onStartMouseDown(e, 4)}
+						// onMouseEnter={onMouseEnter}
+						// onMouseLeave={onMouseLeave}
 					/>
 					<Line
+						// style={colorStyle}
 						x1={rectangle.box.x}
 						y1={rectangle.box.y + rectangle.box.height}
 						x2={rectangle.box.x + rectangle.box.width}
@@ -294,6 +348,8 @@ function BoxMarker(props) {
 						width={10}
 						height={10}
 						onMouseDown={(e) => onStartMouseDown(e, 5)}
+						// onMouseEnter={onMouseEnter}
+						// onMouseLeave={onMouseLeave}
 					/>
 					<MiniRect
 						x={rectangle.box.x + rectangle.box.width - 10 / 2}
@@ -301,6 +357,8 @@ function BoxMarker(props) {
 						width={10}
 						height={10}
 						onMouseDown={(e) => onStartMouseDown(e, 6)}
+						// onMouseEnter={onMouseEnter}
+						// onMouseLeave={onMouseLeave}
 					/>
 					<MiniRect
 						x={rectangle.box.x + rectangle.box.width - 10 / 2}
@@ -308,6 +366,8 @@ function BoxMarker(props) {
 						width={10}
 						height={10}
 						onMouseDown={(e) => onStartMouseDown(e, 7)}
+						// onMouseEnter={onMouseEnter}
+						// onMouseLeave={onMouseLeave}
 					/>
 					<MiniRect
 						x={rectangle.box.x - 10 / 2}
@@ -315,9 +375,24 @@ function BoxMarker(props) {
 						width={10}
 						height={10}
 						onMouseDown={(e) => onStartMouseDown(e, 8)}
+						// onMouseEnter={onMouseEnter}
+						// onMouseLeave={onMouseLeave}
 					/>
 				</G>
 			</SVG>
+			{/* <InputAnchor
+				x={textX}
+				y={textY}
+				rotate={textRotate}
+				onLabelClick={onLabelClick}
+				onNumberChange={onNumberChange}
+				onDeleteButtonClick={onDeleteButtonClick}
+				label={line.label}
+				number={line.number}
+				onInput={onInput}
+				onInputClick={onInputClick}
+				onInputBlur={onInputBlur}
+			/> */}
 		</Container>
 	);
 }
@@ -356,12 +431,19 @@ const Line = styled.line`
 `;
 
 const G = styled.g`
-	pointer-events: auto;
+	pointer-events: ${(props) => (props.selected ? "auto" : "none")};
 `;
 
 const Rectangle = styled.rect`
 	fill: transparent;
 	cursor: move;
+`;
+
+const DiagonalGrabber = styled.rect`
+	stroke-width: 11;
+	stroke-linecap: square;
+	stroke: transparent;
+	stroke-linecap: butt;
 `;
 
 const MiniRect = styled.rect`
