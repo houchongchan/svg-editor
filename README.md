@@ -1,6 +1,8 @@
 ## SVG Editor 
 Pan your images and manipulate measurement lines at the same time.
 
+Proof of concept that allows the user to generate different svg elements that the user can manipulate ( resize / move ) on top of an image. 
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -15,12 +17,3 @@ You may also see any lint errors in the console.
 
 You may add or remove measurements in the Config Folder.
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
