@@ -4,10 +4,6 @@ import InputAnchor from "./InputAnchor";
 import React from "react";
 import { useState } from "react";
 
-const edgeLength = 15;
-const textOffset = 16;
-const quarterCircle = Math.PI / 2;
-
 function BoxMarker(props) {
 	const {
 		onSelected,
@@ -232,10 +228,6 @@ function BoxMarker(props) {
 
 	// const onDeleteButtonClick = () => onDeleteButtonClick(line);
 
-	// const onLabelClick = () => {
-	// 	onLabelClick(line);
-	// };
-
 	// const onNumberChange = (e) => {
 	// 	onNumberChange(line, e);
 	// };
@@ -280,7 +272,6 @@ function BoxMarker(props) {
 						// onMouseLeave={onMouseLeave}
 					/>
 					<Line
-						// style={colorStyle}
 						x1={rectangle.box.x}
 						y1={rectangle.box.y}
 						x2={rectangle.box.x + rectangle.box.width}
@@ -437,13 +428,6 @@ const G = styled.g`
 const Rectangle = styled.rect`
 	fill: transparent;
 	cursor: move;
-`;
-
-const DiagonalGrabber = styled.rect`
-	stroke-width: 11;
-	stroke-linecap: square;
-	stroke: transparent;
-	stroke-linecap: butt;
 `;
 
 const MiniRect = styled.rect`

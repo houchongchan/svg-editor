@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
-import BoxMarker from "./BoxMarker";
+import BoxMarker from "./elements/BoxMarker";
 import styled from "styled-components";
-import LineMeasurement from "./LineMeasurement";
-import { initialLine, initialRect } from "./Config";
-import { useMovingAndScaling } from "./useMovingAndScaling";
-import { initial, initial2 } from "./Config";
+import LineMeasurement from "./elements/LineMeasurement";
+import { initialCircle, initialLine, initialRect } from "./utils/Config";
+import { useMovingAndScaling } from "./utils/useMovingAndScaling";
+import CircleMarker from "./elements/CircleMarker";
 
 const PannableImage = ({ src }) => {
 	const [panning, setPanning] = useState(false);
@@ -21,8 +21,9 @@ const PannableImage = ({ src }) => {
 	});
 
 	const [lines, setLines] = useState(initialLine);
-
 	const [rectangles, setRectangles] = useState(initialRect);
+	const [circles, setCircles] = useState(initialCircle);
+
 	const [selected, setSelected] = useState("");
 	const [dimensions, setDimensions] = useState({ sign: 0, scale: 1 });
 	const [scale, setScale] = useState(1);
@@ -90,6 +91,11 @@ const PannableImage = ({ src }) => {
 	const onChange2 = (m) => {
 		const tmp = rectangles.filter((x) => x.id !== m.id);
 		setRectangles([m, ...tmp]);
+	};
+
+	const onChange3 = (m) => {
+		const tmp = circles.filter((x) => x.id !== m.id);
+		setCircles([m, ...tmp]);
 	};
 
 	return (
@@ -160,6 +166,27 @@ const PannableImage = ({ src }) => {
 							/>
 						);
 					})}
+				{circles &&
+					circles.map((e) => {
+						return (
+							<CircleMarker
+								circle={e}
+								onSelected={() => setSelected(`circle${e.id}`)}
+								selected={selected}
+								onModeChange={(e) => setMode(e)}
+								x={cursorRef.current.x}
+								y={cursorRef.current.y}
+								key={e.id}
+								parentWidth={image.width}
+								parentHeight={image.height}
+								onChange={(e) => onChange3(e)}
+								onMidMouse={() => {}}
+								onInput={() => {}}
+								onInputClick={() => {}}
+								onInputBlur={() => {}}
+							/>
+						);
+					})}
 			</Pannable>
 		</Container>
 	);
@@ -168,8 +195,9 @@ const PannableImage = ({ src }) => {
 export default PannableImage;
 
 const Container = styled.div`
-	background: rgba(0, 255, 255, 0.5);
+	background: rgba(0, 0, 0, 0.8);
 	overflow: hidden;
+	height: 100%;
 `;
 
 const Pannable = styled.div`
@@ -177,7 +205,7 @@ const Pannable = styled.div`
 	transition: scale 0.1s ease-in-out;
 `;
 const Image = styled.img`
-	opacity: 0.5;
+	opacity: 0.6;
 	width ${(props) => props.parentWidth}px;
 	height ${(props) => props.parentHeight}px;
 	

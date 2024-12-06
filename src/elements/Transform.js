@@ -41,38 +41,6 @@ export default function InputAnchor(props) {
 		}
 	};
 
-	// componentDidMount() {
-	// 	this.mounted = true;
-	// 	this.textBox.addEventListener("mouseover", this.onClick);
-	// 	this.textBox.addEventListener("mouseleave", this.onLeave);
-	// 	document.addEventListener("mousedown", this.onDocumentMouseDown);
-	// 	document.addEventListener("keydown", this.onDocumentKeyDown);
-	// 	this.handleChange = this.handleChange.bind(this);
-
-	// 	setTimeout(() => {
-	// 		if (this.mounted) {
-	// 			this.setState({ ...this.state, justCreated: false });
-	// 		}
-	// 	}, 200);
-	// }
-
-	// componentWillUnmount() {
-	// 	this.mounted = false;
-	// 	this.textBox.removeEventListener("mouseover", this.onClick);
-	// 	this.textBox.removeEventListener("mouseleave", this.onLeave);
-	// 	document.removeEventListener("mousedown", this.onDocumentMouseDown);
-	// 	document.removeEventListener("keydown", this.onDocumentKeyDown);
-	// }
-
-	// handleChange(event) {
-	// 	if (event.target.value.length + 1 > 3 || isNaN(event.target.value)) {
-	// 		return;
-	// 	}
-	// 	this.setState({ ...this.state, value: event.target.value });
-	// 	this.onNumberChange(Number(event.target.value));
-	// }
-
-	// render() {
 	const handlerClassName = this.props.handlerClassName;
 	const textAnchorStyle = {
 		left: this.props.x + "px",

@@ -23,46 +23,36 @@ module.exports = {
 	],
 	initialRect: [
 		{
-			AI: 0.4,
 			id: 1,
-			tooth: 30,
 			box: {
-				active: false,
-				class: 1,
-				dragging: false,
 				width: 100,
 				height: 120,
 				x: 50,
 				y: 150,
-				severity: 1,
-			},
-			surface: {
-				buccal: 1,
-				distal: 1,
-				mesial: 0,
-				occlusal: 1,
 			},
 		},
 		{
-			AI: 0.7,
 			id: 2,
-			tooth: 24,
 			box: {
-				active: false,
-				class: 0,
-				dragging: false,
 				width: 80,
 				height: 110,
 				x: 150,
 				y: 120,
-				severity: 2,
 			},
-			surface: {
-				buccal: 0,
-				distal: 1,
-				mesial: 0,
-				occlusal: 1,
-			},
+		},
+	],
+	initialCircle: [
+		{
+			id: 1,
+			radius: 50,
+			x: 50,
+			y: 80,
+		},
+		{
+			id: 2,
+			radius: 20,
+			x: 150,
+			y: 80,
 		},
 	],
 };
