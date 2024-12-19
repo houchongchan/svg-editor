@@ -1,29 +1,25 @@
 import styled from "styled-components";
-import React from "react";
-import { useRef } from "react";
-// import InputAnchor from "./InputAnchor";
-import { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import InputAnchor from "./InputAnchor";
+import { LineLoader } from "./Loaders";
 
 const edgeLength = 15;
-const textOffset = 16;
-const quarterCircle = Math.PI / 2;
 
-function LineMeasurement(props) {
+function LineMarker(props) {
 	const {
 		selected,
 		onSelected,
-		onModeChange,
-		x,
-		y,
 		line,
 		parentWidth,
 		parentHeight,
-		measureLine,
 		onChange,
-		onMidMouse,
+		onChangeClick,
+		onDeleteClick,
 	} = props;
+
 	const [clicked, setClicked] = useState(false);
-	const [doubleClick, setDoubleClick] = useState(false);
+	const [loading, setLoading] = useState(true);
+
 	const startDragInProgress = useRef(false);
 	const endDragInProgress = useRef(false);
 	const midDragInProgress = useRef(false);
@@ -47,17 +43,14 @@ function LineMeasurement(props) {
 	const edgeX = (edgeLength * Math.sin(rotate)) / 3.0;
 	const edgeY = (edgeLength * Math.cos(rotate)) / 3.0;
 
-	// Text layout (make sure the text is never rotated so much to be upside down):
 	const centerX = (startX + endX) / 2;
 	const centerY = (startY + endY) / 2;
-	const rotateIsSmall = Math.abs(rotate) <= quarterCircle;
-	const offsetX = (rotateIsSmall ? -1 : 1) * textOffset * Math.sin(rotate);
-	const offsetY = (rotateIsSmall ? 1 : -1) * textOffset * Math.cos(rotate);
-	const textX = centerX + offsetX;
-	const textY = centerY + offsetY;
-	const textRotate = Math.atan2(offsetY, offsetX) - quarterCircle;
 
-	const text = measureLine(line);
+	useEffect(() => {
+		const interval = setTimeout(() => setLoading(false), 500);
+
+		return () => clearTimeout(interval);
+	}, []);
 
 	const onStartMouseDown = (event) => {
 		if (event.button === 0) {
@@ -104,7 +97,6 @@ function LineMeasurement(props) {
 		if (startDragInProgress.current) {
 			const startX = clamp(getXAfterDrag(startXAtPress, eventX));
 			const startY = clamp(getYAfterDrag(startYAtPress, eventY));
-			console.log(startX, startY);
 			onChange({ ...line, startX, startY });
 		} else if (endDragInProgress.current) {
 			const endX = clamp(getXAfterDrag(endXAtPress, eventX));
@@ -174,25 +166,7 @@ function LineMeasurement(props) {
 		setClicked(false);
 	};
 
-	const onMidMouseEnter = (event) => {
-		onMidMouse("enter");
-	};
-
-	const onMidMouseLeave = (event) => {
-		onMidMouse("leave");
-	};
-
 	const clamp = (value) => Math.min(1, Math.max(0, value));
-
-	const onDeleteButtonClick = () => onDeleteButtonClick(line);
-
-	const onLabelClick = () => {
-		onLabelClick(line);
-	};
-
-	const onNumberChange = (e) => {
-		onNumberChange(line, e);
-	};
 
 	return (
 		<Container
@@ -203,62 +177,59 @@ function LineMeasurement(props) {
 			height={parentHeight}
 			dragging={clicked}
 		>
-			<SVG>
-				<G selected={selected == "" || selected == `line${line.id}`}>
-					<MidGrabber
-						x1={startX}
-						y1={startY}
-						x2={endX}
-						y2={endY}
-						onMouseDown={onMidMouseDown}
-						onMouseEnter={onMidMouseEnter}
-						onMouseLeave={onMidMouseLeave}
-					/>
-					<Line x1={startX} y1={startY} x2={endX} y2={endY} />
-				</G>
-				<G selected={selected == "" || selected == `line${line.id}`}>
-					<Grabber
-						x1={startX - edgeX}
-						y1={startY + edgeY}
-						x2={startX + edgeX}
-						y2={startY - edgeY}
-						onMouseDown={onStartMouseDown}
-						onMouseEnter={onMidMouseEnter}
-						onMouseLeave={onMidMouseLeave}
-					/>
-					<Circle cx={startX} cy={startY} r={4} />
-				</G>
-				<G selected={selected == "" || selected == `line${line.id}`}>
-					<Grabber
-						x1={endX - edgeX}
-						y1={endY + edgeY}
-						x2={endX + edgeX}
-						y2={endY - edgeY}
-						onMouseDown={onEndMouseDown}
-						onMouseEnter={onMidMouseEnter}
-						onMouseLeave={onMidMouseLeave}
-					/>
-					<Circle cx={endX} cy={endY} r={4} />
-				</G>
-			</SVG>
-			{/* <InputAnchor
-				x={textX}
-				y={textY}
-				rotate={textRotate}
-				onLabelClick={onLabelClick}
-				onNumberChange={onNumberChange}
-				onDeleteButtonClick={onDeleteButtonClick}
-				label={line.label}
-				number={line.number}
-				onInput={onInput}
-				onInputClick={onInputClick}
-				onInputBlur={onInputBlur}
-			/> */}
+			{!loading ? (
+				<>
+					<SVG>
+						<G selected={selected === "" || selected === `line${line.id}`}>
+							<MidGrabber
+								x1={startX}
+								y1={startY}
+								x2={endX}
+								y2={endY}
+								onMouseDown={onMidMouseDown}
+							/>
+							<Line x1={startX} y1={startY} x2={endX} y2={endY} />
+						</G>
+						<G selected={selected === "" || selected === `line${line.id}`}>
+							<Grabber
+								x1={startX - edgeX}
+								y1={startY + edgeY}
+								x2={startX + edgeX}
+								y2={startY - edgeY}
+								onMouseDown={onStartMouseDown}
+							/>
+							<Circle cx={startX} cy={startY} r={4} />
+						</G>
+						<G selected={selected === "" || selected === `line${line.id}`}>
+							<Grabber
+								x1={endX - edgeX}
+								y1={endY + edgeY}
+								x2={endX + edgeX}
+								y2={endY - edgeY}
+								onMouseDown={onEndMouseDown}
+							/>
+							<Circle cx={endX} cy={endY} r={4} />
+						</G>
+					</SVG>
+					{!clicked && (
+						<InputAnchor
+							id={line.id}
+							x={centerX}
+							y={centerY}
+							type={"line"}
+							onChangeClick={onChangeClick}
+							onDeleteClick={onDeleteClick}
+						/>
+					)}
+				</>
+			) : (
+				<LineLoader x={centerX} y={centerY} />
+			)}
 		</Container>
 	);
 }
 
-export default React.memo(LineMeasurement);
+export default React.memo(LineMarker);
 
 const Container = styled.div.attrs((props) => ({
 	style: {
@@ -272,8 +243,8 @@ const Container = styled.div.attrs((props) => ({
 `;
 
 const SVG = styled.svg`
-	stroke: red;
-	fill: red;
+	stroke: var(--purple);
+	fill: var(--purple);
 	stroke-width: 3px;
 	cursor: pointer;
 	width: 100%;

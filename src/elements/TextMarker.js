@@ -4,14 +4,14 @@ import InputAnchor from "./InputAnchor";
 
 import { BoxLoader } from "./Loaders";
 
-function BoxMarker(props) {
+function TextMarker(props) {
 	const {
 		onSelected,
 		selected,
 		onModeChange,
 		x,
 		y,
-		rectangle,
+		text,
 		parentWidth,
 		parentHeight,
 		onChange,
@@ -45,7 +45,7 @@ function BoxMarker(props) {
 
 	const onStartMouseDown = (event, direction) => {
 		if (event.button === 0) {
-			onModeChange("box");
+			onModeChange("text");
 			if (direction === 1 || direction === 5 || direction === 6) {
 				topDragInProgress.current = true;
 			}
@@ -65,7 +65,7 @@ function BoxMarker(props) {
 
 	const onMidMouseDown = (event) => {
 		if (event.button === 0) {
-			onModeChange("box");
+			onModeChange("text");
 			midDragInProgress.current = true;
 			event.preventDefault();
 			onDragBegin(event.clientX, event.clientY);
@@ -74,22 +74,15 @@ function BoxMarker(props) {
 
 	const onDragBegin = (eventX, eventY, direction = 0) => {
 		setClicked(true);
-		if (direction === 1 || direction === 4) {
-			mouseXAtPress.current = rectangle.x;
-			mouseYAtPress.current = eventY;
-		}
-		if (direction === 2 || direction === 3) {
-			mouseXAtPress.current = eventX;
-			mouseYAtPress.current = rectangle.y;
-		} else {
-			mouseXAtPress.current = eventX;
-			mouseYAtPress.current = eventY;
-		}
-		rectAtPress.current = rectangle;
-		startXAtPress.current = rectangle.x;
-		startYAtPress.current = rectangle.y;
-		widthAtPress.current = rectangle.width;
-		heightAtPress.current = rectangle.height;
+
+		mouseXAtPress.current = eventX;
+		mouseYAtPress.current = eventY;
+
+		rectAtPress.current = text;
+		startXAtPress.current = text.x;
+		startYAtPress.current = text.y;
+		widthAtPress.current = text.width;
+		heightAtPress.current = text.height;
 	};
 
 	const onMouseMove = (x, y) => {
@@ -103,7 +96,7 @@ function BoxMarker(props) {
 			const [height, y] = getTopAfterDrag(startYAtPress, heightAtPress, eventY);
 			const [width, x] = getLeftAfterDrag(startXAtPress, widthAtPress, eventX);
 			onChange({
-				...rectangle,
+				...text,
 				width,
 				x,
 				height,
@@ -115,7 +108,7 @@ function BoxMarker(props) {
 			const [height, y] = getTopAfterDrag(startYAtPress, heightAtPress, eventY);
 			const width = getWidthAfterDrag(widthAtPress, eventX);
 			onChange({
-				...rectangle,
+				...text,
 				width,
 				height,
 				y,
@@ -127,7 +120,7 @@ function BoxMarker(props) {
 			const height = getHeightAfterDrag2(heightAtPress, eventY);
 			const width = getWidthAfterDrag(widthAtPress, eventX);
 			onChange({
-				...rectangle,
+				...text,
 				width,
 				height,
 			});
@@ -137,7 +130,7 @@ function BoxMarker(props) {
 			const [width, x] = getLeftAfterDrag(startXAtPress, widthAtPress, eventX);
 			const height = getHeightAfterDrag2(heightAtPress, eventY);
 			onChange({
-				...rectangle,
+				...text,
 				width,
 				height,
 				x,
@@ -148,27 +141,27 @@ function BoxMarker(props) {
 			const [height, y] = getTopAfterDrag(startYAtPress, heightAtPress, eventY);
 
 			onChange({
-				...rectangle,
+				...text,
 				height,
 				y,
 			});
 		} else if (bottomDragInProgress.current) {
 			const height = getHeightAfterDrag2(heightAtPress, eventY);
 			onChange({
-				...rectangle,
+				...text,
 				height,
 			});
 		} else if (leftDragInProgress.current) {
 			const [width, x] = getLeftAfterDrag(startXAtPress, widthAtPress, eventX);
 			onChange({
-				...rectangle,
+				...text,
 				width,
 				x,
 			});
 		} else if (rightDragInProgress.current) {
 			const width = getWidthAfterDrag(widthAtPress, eventX);
 			onChange({
-				...rectangle,
+				...text,
 				width,
 			});
 		} else if (midDragInProgress.current) {
@@ -189,7 +182,7 @@ function BoxMarker(props) {
 			} else if (bottomBound > parentHeight) {
 				y = parentHeight - heightAtPress.current;
 			}
-			onChange({ ...rectangle, x, y });
+			onChange({ ...text, x, y });
 		}
 	};
 
@@ -254,129 +247,99 @@ function BoxMarker(props) {
 		>
 			{!loading ? (
 				<>
+					<Input
+						contentEditable="true"
+						x={text.x + 5}
+						y={text.y + 5}
+						width={text.width - 10}
+						height={text.height - 10}
+					>
+						{text.text}
+					</Input>
 					<SVG>
-						<G selected={selected === "" || selected === `box${rectangle.id}`}>
-							<Rectangle
-								x={rectangle.x}
-								y={rectangle.y}
-								width={rectangle.width}
-								height={rectangle.height}
+						<G selected={selected === "" || selected === `text${text.id}`}>
+							<Line
+								x1={text.x}
+								y1={text.y}
+								x2={text.x + text.width}
+								y2={text.y}
+							/>
+						</G>
+						<G selected={selected === "" || selected === `text${text.id}`}>
+							<Line
+								x1={text.x}
+								y1={text.y}
+								x2={text.x}
+								y2={text.y + text.height}
+							/>
+						</G>
+						<G selected={selected === "" || selected === `text${text.id}`}>
+							<Line
+								x1={text.x + text.width}
+								y1={text.y}
+								x2={text.x + text.width}
+								y2={text.y + text.height}
+							/>
+						</G>
+						<G selected={selected === "" || selected === `text${text.id}`}>
+							<Line
+								x1={text.x}
+								y1={text.y + text.height}
+								x2={text.x + text.width}
+								y2={text.y + text.height}
+							/>
+						</G>
+						<G selected={selected === "" || selected === `text${text.id}`}>
+							<MiniRect
+								x={text.x - 10 / 2}
+								y={text.y - 10 / 2}
+								width={10}
+								height={10}
 								onMouseDown={onMidMouseDown}
 							/>
-						</G>
-						<G selected={selected === "" || selected === `box${rectangle.id}`}>
-							<MidGrabber
-								x1={rectangle.x}
-								y1={rectangle.y}
-								x2={rectangle.x + rectangle.width}
-								y2={rectangle.y}
-								onMouseDown={(e) => onStartMouseDown(e, 1)}
-							/>
-							<Line
-								x1={rectangle.x}
-								y1={rectangle.y}
-								x2={rectangle.x + rectangle.width}
-								y2={rectangle.y}
-							/>
-						</G>
-						<G selected={selected === "" || selected === `box${rectangle.id}`}>
-							<MidGrabber
-								x1={rectangle.x}
-								y1={rectangle.y}
-								x2={rectangle.x}
-								y2={rectangle.y + rectangle.height}
-								onMouseDown={(e) => onStartMouseDown(e, 2)}
-							/>
-							<Line
-								x1={rectangle.x}
-								y1={rectangle.y}
-								x2={rectangle.x}
-								y2={rectangle.y + rectangle.height}
-							/>
-						</G>
-						<G selected={selected === "" || selected === `box${rectangle.id}`}>
-							<MidGrabber
-								x1={rectangle.x + rectangle.width}
-								y1={rectangle.y}
-								x2={rectangle.x + rectangle.width}
-								y2={rectangle.y + rectangle.height}
-								onMouseDown={(e) => onStartMouseDown(e, 3)}
-							/>
-							<Line
-								x1={rectangle.x + rectangle.width}
-								y1={rectangle.y}
-								x2={rectangle.x + rectangle.width}
-								y2={rectangle.y + rectangle.height}
-							/>
-						</G>
-						<G selected={selected === "" || selected === `box${rectangle.id}`}>
-							<MidGrabber
-								x1={rectangle.x}
-								y1={rectangle.y + rectangle.height}
-								x2={rectangle.x + rectangle.width}
-								y2={rectangle.y + rectangle.height}
-								onMouseDown={(e) => onStartMouseDown(e, 4)}
-							/>
-							<Line
-								x1={rectangle.x}
-								y1={rectangle.y + rectangle.height}
-								x2={rectangle.x + rectangle.width}
-								y2={rectangle.y + rectangle.height}
-							/>
-						</G>
-						<G selected={selected === "" || selected === `box${rectangle.id}`}>
 							<MiniRect
-								x={rectangle.x - 10 / 2}
-								y={rectangle.y - 10 / 2}
-								width={10}
-								height={10}
-								onMouseDown={(e) => onStartMouseDown(e, 5)}
-							/>
-							<MiniRect
-								x={rectangle.x + rectangle.width - 10 / 2}
-								y={rectangle.y - 10 / 2}
-								width={10}
-								height={10}
+								x={text.x + text.width - 5 / 2}
+								y={text.y - 5 / 2}
+								width={5}
+								height={5}
 								onMouseDown={(e) => onStartMouseDown(e, 6)}
 							/>
 							<MiniRect
-								x={rectangle.x + rectangle.width - 10 / 2}
-								y={rectangle.y + rectangle.height - 10 / 2}
-								width={10}
-								height={10}
+								x={text.x + text.width - 5 / 2}
+								y={text.y + text.height - 5 / 2}
+								width={5}
+								height={5}
 								onMouseDown={(e) => onStartMouseDown(e, 7)}
 							/>
 							<MiniRect
-								x={rectangle.x - 10 / 2}
-								y={rectangle.y + rectangle.height - 10 / 2}
-								width={10}
-								height={10}
+								x={text.x - 5 / 2}
+								y={text.y + text.height - 5 / 2}
+								width={5}
+								height={5}
 								onMouseDown={(e) => onStartMouseDown(e, 8)}
 							/>
 						</G>
 					</SVG>
+
 					{!clicked && (
 						<InputAnchor
-							id={rectangle.id}
-							x={rectangle.x + rectangle.width / 2}
-							y={rectangle.y + rectangle.height / 2}
-							type={"box"}
+							id={text.id}
+							x={text.x + 20}
+							y={text.y - 20}
+							type={"text"}
 							onChangeClick={onChangeClick}
 							onDeleteClick={onDeleteClick}
 						/>
 					)}
 				</>
 			) : (
-				<BoxLoader
-					x={rectangle.x + rectangle.width / 2}
-					y={rectangle.y + rectangle.height / 2}
-				/>
+				<BoxLoader x={text.x + text.width / 2} y={text.y + text.height / 2} />
 			)}
 		</Container>
 	);
 }
 
-export default React.memo(BoxMarker);
+export default React.memo(TextMarker);
 
 const Container = styled.div.attrs((props) => ({
 	style: {
@@ -387,6 +350,7 @@ const Container = styled.div.attrs((props) => ({
 	position: absolute;
 	top: 0px;
 	pointer-events: ${(props) => (props.dragging ? "all" : "none")};
+	z-index: 5;
 `;
 
 const SVG = styled.svg`
@@ -394,14 +358,7 @@ const SVG = styled.svg`
 	cursor: pointer;
 	width: 100%;
 	height: 100%;
-`;
-
-const MidGrabber = styled.line`
-	stroke-width: 11;
-	stroke-linecap: square;
-	stroke: transparent;
-	stroke-linecap: butt;
-	cursor: n-resize;
+	stroke-dasharray: 10, 3;
 `;
 
 const Line = styled.line`
@@ -413,9 +370,21 @@ const G = styled.g`
 	pointer-events: ${(props) => (props.selected ? "auto" : "none")};
 `;
 
-const Rectangle = styled.rect`
-	fill: transparent;
-	cursor: move;
+const Input = styled.text.attrs((props) => ({
+	style: {
+		width: props.width + "px",
+		height: props.height + "px",
+	},
+}))`
+	position: absolute;
+	top: ${(props) => props.y}px;
+	left: ${(props) => props.x}px;
+	width: fit-content;
+	height: fit-content;
+	pointer: cursor;
+	pointer-events: auto;
+	outline: 0px solid transparent;
+	margin: 5px;
 `;
 
 const MiniRect = styled.rect`

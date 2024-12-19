@@ -1,17 +1,26 @@
 import React, { useRef, useState } from "react";
-import BoxMarker from "./elements/BoxMarker";
 import styled from "styled-components";
-import LineMeasurement from "./elements/LineMeasurement";
-import { initialCircle, initialLine, initialRect } from "./utils/Config";
 import { useMovingAndScaling } from "./utils/useMovingAndScaling";
+import BoxMarker from "./elements/BoxMarker";
 import CircleMarker from "./elements/CircleMarker";
+import LineMarker from "./elements/LineMarker";
+import TextMarker from "./elements/TextMarker";
 
-const PannableImage = ({ src }) => {
+const PannableImage = ({
+	downloadRef,
+	src,
+	circles,
+	lines,
+	rectangles,
+	texts,
+	setLines,
+	setCircles,
+	setRectangles,
+	setTexts,
+	image,
+	setImage,
+}) => {
 	const [panning, setPanning] = useState(false);
-	const [image, setImage] = useState({
-		width: 0,
-		height: 0,
-	});
 	const [position, setPosition] = useState({
 		oldX: 0,
 		oldY: 0,
@@ -20,13 +29,7 @@ const PannableImage = ({ src }) => {
 		z: 1,
 	});
 
-	const [lines, setLines] = useState(initialLine);
-	const [rectangles, setRectangles] = useState(initialRect);
-	const [circles, setCircles] = useState(initialCircle);
-
 	const [selected, setSelected] = useState("");
-	const [dimensions, setDimensions] = useState({ sign: 0, scale: 1 });
-	const [scale, setScale] = useState(1);
 	const [mode, setMode] = useState("");
 
 	const cursorRef = useRef({ x: 0, y: 0 });
@@ -67,7 +70,6 @@ const PannableImage = ({ src }) => {
 			const sign = Math.sign(e.deltaY) / 10;
 			const scale = 1 - sign;
 
-			setDimensions({ sign: sign, scale: 1 - sign });
 			const rect = containerRef.current.getBoundingClientRect();
 
 			setPosition({
@@ -79,7 +81,6 @@ const PannableImage = ({ src }) => {
 						sign,
 				z: position.z * scale,
 			});
-			setScale(scale);
 		}
 	};
 
@@ -98,6 +99,91 @@ const PannableImage = ({ src }) => {
 		setCircles([m, ...tmp]);
 	};
 
+	const onChange4 = (m) => {
+		const tmp = texts.filter((x) => x.id !== m.id);
+		setTexts([m, ...tmp]);
+	};
+
+	const onDeleteClick = (id, oldType) => {
+		if (oldType === "circle") {
+			const tmp = circles.filter((x) => x.id !== id);
+
+			setCircles([...tmp]);
+		}
+		if (oldType === "line") {
+			const tmp = lines.filter((x) => x.id !== id);
+
+			setLines([...tmp]);
+		}
+
+		if (oldType === "box") {
+			const tmp = rectangles.filter((x) => x.id !== id);
+			setRectangles([...tmp]);
+		}
+		if (oldType === "text") {
+			const tmp = texts.filter((x) => x.id !== id);
+			setTexts([...tmp]);
+		}
+	};
+
+	const onChangeClick = (id, oldType, newType) => {
+		const elements =
+			oldType === "circle" ? circles : oldType === "box" ? rectangles : lines;
+
+		const element = elements.find((e) => e.id === id);
+
+		const newElements =
+			newType === "circle" ? circles : newType === "box" ? rectangles : lines;
+
+		if (newType === "circle") {
+			const circle = {
+				id: circles.length + 1,
+				radius: 50,
+				x: element.x,
+				y: element.y,
+			};
+			setCircles([...newElements, circle]);
+		}
+
+		if (newType === "line") {
+			const line = {
+				id: lines.length + 1,
+				type: "line",
+				startX: 0.5,
+				startY: 0.5,
+				endX: 0.6,
+				endY: 0.6,
+			};
+			setLines([...newElements, line]);
+		}
+
+		if (newType === "box") {
+			const rectangle = {
+				id: rectangles.length + 1,
+				width: 50,
+				height: 50,
+				x: element.x,
+				y: element.y,
+			};
+			setRectangles([...newElements, rectangle]);
+		}
+
+		if (oldType === "circle") {
+			const tmp = circles.filter((x) => x.id !== id);
+			setCircles([...tmp]);
+		}
+
+		if (oldType === "line") {
+			const tmp = lines.filter((x) => x.id !== id);
+			setLines([...tmp]);
+		}
+
+		if (oldType === "box") {
+			const tmp = rectangles.filter((x) => x.id !== id);
+			setRectangles([...tmp]);
+		}
+	};
+
 	return (
 		<Container
 			ref={containerRef}
@@ -113,6 +199,7 @@ const PannableImage = ({ src }) => {
 					translate: `${offsetX}px ${offsetY}px`,
 					scale: `${scaleFactor}`,
 				}}
+				ref={downloadRef}
 			>
 				<Image
 					alt="image"
@@ -120,14 +207,13 @@ const PannableImage = ({ src }) => {
 					onLoad={onLoad}
 					draggable={false}
 					data-pannable
-					onMouseDown={() => setMode("image")}
 					parentWidth={image.width}
 					parentHeight={image.height}
 				/>
 				{lines &&
 					lines.map((e) => {
 						return (
-							<LineMeasurement
+							<LineMarker
 								onSelected={() => setSelected(`line${e.id}`)}
 								selected={selected}
 								onModeChange={(e) => setMode(e)}
@@ -139,9 +225,8 @@ const PannableImage = ({ src }) => {
 								parentHeight={image.height}
 								measureLine={() => {}}
 								onChange={(e) => onChange(e)}
-								onMidMouse={() => {}}
-								onLabelClick={() => {}}
-								onNumberChange={() => {}}
+								onChangeClick={onChangeClick}
+								onDeleteClick={onDeleteClick}
 							/>
 						);
 					})}
@@ -159,10 +244,8 @@ const PannableImage = ({ src }) => {
 								parentWidth={image.width}
 								parentHeight={image.height}
 								onChange={(e) => onChange2(e)}
-								onMidMouse={() => {}}
-								onInput={() => {}}
-								onInputClick={() => {}}
-								onInputBlur={() => {}}
+								onChangeClick={onChangeClick}
+								onDeleteClick={onDeleteClick}
 							/>
 						);
 					})}
@@ -180,10 +263,27 @@ const PannableImage = ({ src }) => {
 								parentWidth={image.width}
 								parentHeight={image.height}
 								onChange={(e) => onChange3(e)}
-								onMidMouse={() => {}}
-								onInput={() => {}}
-								onInputClick={() => {}}
-								onInputBlur={() => {}}
+								onChangeClick={onChangeClick}
+								onDeleteClick={onDeleteClick}
+							/>
+						);
+					})}
+				{texts &&
+					texts.map((e) => {
+						return (
+							<TextMarker
+								text={e}
+								onSelected={() => setSelected(`text${e.id}`)}
+								selected={selected}
+								onModeChange={(e) => setMode(e)}
+								x={cursorRef.current.x}
+								y={cursorRef.current.y}
+								key={e.id}
+								parentWidth={image.width}
+								parentHeight={image.height}
+								onChange={(e) => onChange4(e)}
+								onChangeClick={onChangeClick}
+								onDeleteClick={onDeleteClick}
 							/>
 						);
 					})}
@@ -197,12 +297,15 @@ export default PannableImage;
 const Container = styled.div`
 	background: rgba(0, 0, 0, 0.8);
 	overflow: hidden;
-	height: 100%;
+	display: flex;
+	align-items: stretch;
+	flex-grow: 1;
 `;
 
 const Pannable = styled.div`
 	position: relative;
 	transition: scale 0.1s ease-in-out;
+	width: fit-content;
 `;
 const Image = styled.img`
 	opacity: 0.6;

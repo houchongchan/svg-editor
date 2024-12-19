@@ -1,9 +1,24 @@
 html {
   overscroll-behavior-x: none;
+  box-sizing: border-box;
 }
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
 body {
   overscroll-behavior-x: none;
   background: var(--magenta);
+  width: 100%; 
+  height: 100%;
+  margin: 0;
+}
+
+#root { 
+  width: 100%; 
+  height: 100%;
+
 }
 
 :root { 
@@ -12,7 +27,12 @@ body {
   --rosy: #D1A7A0; 
   --dun: #D4CBB3;
   --tea: #D2E0BF; 
-
+  --purple: #52096b;
+  --lightpurp: #8120a1;
   width: 100%; 
   height: 100%;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }

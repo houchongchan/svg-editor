@@ -1,8 +1,9 @@
 import styled from "styled-components";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import InputAnchor from "./InputAnchor";
 import React from "react";
 import { useState } from "react";
+import { CircleLoader } from "./Loaders";
 
 function CircleMarker(props) {
 	const {
@@ -15,12 +16,12 @@ function CircleMarker(props) {
 		parentWidth,
 		parentHeight,
 		onChange,
-		onMidMouse,
-		onInput,
-		onInputClick,
-		onInputBlur,
+		onChangeClick,
+		onDeleteClick,
 	} = props;
+
 	const [clicked, setClicked] = useState(false);
+	const [loading, setLoading] = useState(true);
 
 	const radiusDragInProgress = useRef(false);
 	const midDragInProgress = useRef(false);
@@ -38,6 +39,12 @@ function CircleMarker(props) {
 
 	const centerX = circle.x;
 	const centerY = circle.y;
+
+	useEffect(() => {
+		const interval = setTimeout(() => setLoading(false), 500);
+
+		return () => clearTimeout(interval);
+	}, []);
 
 	const onStartMouseDown = (event, direction) => {
 		onModeChange("circle");
@@ -74,7 +81,6 @@ function CircleMarker(props) {
 	const onDrag = (eventX, eventY) => {
 		if (radiusDragInProgress.current) {
 			const radius = getRadiusAfterDrag(radiusAtPress, eventX, eventY);
-			console.log(radius, radiusAtPress);
 			onChange({
 				...circle,
 				radius,
@@ -136,18 +142,6 @@ function CircleMarker(props) {
 
 	// const onDeleteButtonClick = () => onDeleteButtonClick(line);
 
-	// const onNumberChange = (e) => {
-	// 	onNumberChange(line, e);
-	// };
-
-	const onMouseEnter = () => {
-		onModeChange("circle");
-	};
-
-	const onMouseLeave = () => {
-		onModeChange("image");
-	};
-
 	return (
 		<Container
 			onMouseMove={() => onMouseMove(x, y)}
@@ -157,34 +151,43 @@ function CircleMarker(props) {
 			height={parentHeight}
 			dragging={clicked}
 		>
-			<SVG>
-				<G selected={selected === "" || selected === `circle${circle.id}`}>
-					<RadiusGrabber
-						cx={centerX}
-						cy={centerY}
-						r={circle.radius}
-						onMouseDown={(e) => onStartMouseDown(e, 1)}
-					/>
-					<UnFilledCircle cx={centerX} cy={centerY} r={circle.radius} />
-				</G>
-				<G selected={selected === "" || selected === `circle${circle.id}`}>
-					<MidGrabber
-						cx={centerX}
-						cy={centerY}
-						r={5}
-						onMouseDown={onMidMouseDown}
-					/>
-					<Center cx={centerX} cy={centerY} r={5} />
-				</G>
-			</SVG>
-			<InputAnchor
-				x={circle.x - 150}
-				y={circle.y - 150}
-				type={"circle"}
-				onInput={onInput}
-				onInputClick={onInputClick}
-				onInputBlur={onInputBlur}
-			/>
+			{!loading ? (
+				<>
+					<SVG>
+						<G selected={selected === "" || selected === `circle${circle.id}`}>
+							<MidGrabber
+								cx={centerX}
+								cy={centerY}
+								r={circle.radius - 10}
+								onMouseDown={onMidMouseDown}
+							/>
+						</G>
+						<G selected={selected === "" || selected === `circle${circle.id}`}>
+							<RadiusGrabber
+								cx={centerX}
+								cy={centerY}
+								r={circle.radius - 4}
+								onMouseDown={(e) => onStartMouseDown(e, 1)}
+							/>
+							<UnFilledCircle cx={centerX} cy={centerY} r={circle.radius} />
+						</G>
+					</SVG>
+					{!clicked && (
+						<InputAnchor
+							id={circle.id}
+							x={centerX}
+							y={centerY}
+							width={circle.radius}
+							height={circle.radius}
+							type={"circle"}
+							onChangeClick={onChangeClick}
+							onDeleteClick={onDeleteClick}
+						/>
+					)}
+				</>
+			) : (
+				<CircleLoader x={centerX} y={centerY} />
+			)}
 		</Container>
 	);
 }
@@ -219,7 +222,7 @@ const MidGrabber = styled.circle`
 `;
 
 const RadiusGrabber = styled.circle`
-	stroke-width: 6;
+	stroke-width: 10;
 	stroke-linecap: square;
 	stroke: transparent;
 	fill: none;
@@ -229,15 +232,8 @@ const RadiusGrabber = styled.circle`
 const UnFilledCircle = styled.circle`
 	stroke-width: 3;
 	pointer-events: none;
-	stroke: red;
+	stroke: var(--purple);
 	fill: transparent;
-`;
-
-const Center = styled.circle`
-	pointer-events: none;
-	fill: orange;
-	stroke-width: 1px;
-	stroke: yellow;
 `;
 
 const G = styled.g`
