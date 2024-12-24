@@ -96,29 +96,21 @@ export default function Controls({
 const Label = styled.label`
 	cursor: pointer;
 	display: flex;
-
-	width: 30px;
-	height: 20px;
-	padding: 5px;
+	padding: 5px 20px;
 	border-radius: 4px;
 	justify-content: center;
 	align-items: center;
+	background: var(--deepblue);
 
 	svg {
-		fill: var(--white);
+		fill: var(--magenta);
 	}
 
 	&:hover {
-		color: var(--border-hover);
-		svg {
-			fill: var(--border-hover);
-		}
-	}
+		background: var(--purple);
 
-	&:active {
-		color: var(--branding-colorbrandcyansecondary);
 		svg {
-			fill: var(--branding-colorbrandcyansecondary);
+			fill: var(--rosy);
 		}
 	}
 
@@ -191,9 +183,7 @@ const AddButton = styled.div`
 
 const SmallButton = styled.div`
 	display: flex;
-	width: 30px;
-	height: 20px;
-	padding: 5px;
+	padding: 5px 20px;
 	border-radius: 4px;
 	justify-content: space-between;
 	z-index: 100;
@@ -201,4 +191,18 @@ const SmallButton = styled.div`
 	display: flex;
 	justify-content: center;
 	align-items: center;
+
+	background: var(--deepblue);
+
+	svg {
+		fill: var(--magenta);
+	}
+
+	&:hover {
+		background: var(--purple);
+
+		svg {
+			fill: var(--rosy);
+		}
+	}
 `;

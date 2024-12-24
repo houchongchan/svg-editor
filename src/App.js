@@ -16,7 +16,8 @@ import Footer from "./Footer";
 
 function App() {
 	const [addMode, addModeSet] = useState(null);
-
+	const [loadLanding, setLoadLanding] = useState(true);
+	const [expandHeight, setExpandHeight] = useState(true);
 	const [lines, setLines] = useState(initialLine);
 	const [rectangles, setRectangles] = useState(initialRect);
 	const [circles, setCircles] = useState(initialCircle);
@@ -28,7 +29,19 @@ function App() {
 
 	const [src, setSrc] = useState(Picture);
 	const downloadRef = useRef();
-	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		const interval = setTimeout(() => setLoadLanding(false), 3000);
+
+		return () => clearTimeout(interval);
+	}, []);
+
+	useEffect(() => {
+		if (loadLanding) return;
+		const interval = setTimeout(() => setExpandHeight(false), 2000);
+
+		return () => clearTimeout(interval);
+	}, [loadLanding]);
 
 	useEffect(() => {
 		if (addMode !== null) {
@@ -106,35 +119,37 @@ function App() {
 	};
 
 	return (
-		<Container>
-			<Header height={!loading} />
-			<Body>
-				<Controls
-					updateAddMode={addModeSet}
-					addMode={addMode}
-					setSrc={setSrc}
-					clearSelection={clearSelection}
-					downloadImage={downloadImage}
-				/>
-				<ImageWrapper>
-					<PannableImage
-						downloadRef={downloadRef}
-						src={src}
-						setRectangles={setRectangles}
-						setCircles={setCircles}
-						setLines={setLines}
-						setTexts={setTexts}
-						image={image}
-						setImage={setImage}
-						rectangles={rectangles}
-						circles={circles}
-						lines={lines}
-						texts={texts}
-						setMode={addModeSet}
+		<Container expandHeight={expandHeight}>
+			<Header loadLanding={loadLanding} setLoadLanding={setLoadLanding} />
+			{!expandHeight && (
+				<Body>
+					<Controls
+						updateAddMode={addModeSet}
+						addMode={addMode}
+						setSrc={setSrc}
+						clearSelection={clearSelection}
+						downloadImage={downloadImage}
 					/>
-				</ImageWrapper>
-			</Body>
-			<Footer />
+					<ImageWrapper>
+						<PannableImage
+							downloadRef={downloadRef}
+							src={src}
+							setRectangles={setRectangles}
+							setCircles={setCircles}
+							setLines={setLines}
+							setTexts={setTexts}
+							image={image}
+							setImage={setImage}
+							rectangles={rectangles}
+							circles={circles}
+							lines={lines}
+							texts={texts}
+							setMode={addModeSet}
+						/>
+					</ImageWrapper>
+				</Body>
+			)}
+			{!expandHeight && <Footer />}
 		</Container>
 	);
 }
@@ -157,7 +172,8 @@ const Container = styled.div`
 	&::scrollbar {
 		display: none;
 	}
-	height: 100%;
+	${({ expandHeight }) => !expandHeight && "height: 100%;"}
+	transition: height 1s linear;
 `;
 
 const ImageWrapper = styled.div`

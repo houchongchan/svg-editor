@@ -1,47 +1,25 @@
 import styled from "styled-components";
 import { ReactComponent as PolygonIcon } from "./icons/polygon.svg";
-import { useEffect, useState } from "react";
 
-export default function Header() {
-	const [height, setHeight] = useState(false);
-
-	useEffect(() => {
-		const interval = setTimeout(() => setHeight(true), 5000);
-
-		return () => clearTimeout(interval);
-	}, []);
-
+export default function Header({ loadLanding }) {
 	return (
-		<Container height={height}>
-			{!height && (
-				<>
-					<Moving play={!height}>
-						<Polygon />
-					</Moving>
-					<Title height={0}>SVG Editor</Title>
-					<PolygonIcon opacity={height ? 1 : 0} />
-				</>
-			)}
-			<Display height={height}>
-				<PolygonIcon />
-				<Title height={1}>SVG Editor</Title>
-				<PolygonIcon />
-			</Display>
+		<Container loadLanding={loadLanding}>
+			<MovingDisplay>
+				<Moving>
+					<Polygon loadLanding={loadLanding} />
+				</Moving>
+				<Title loadLanding={loadLanding}>SVG Editor</Title>
+				<StationaryPolygon
+					loadLanding={loadLanding}
+					opacity={!loadLanding ? 1 : 0}
+				/>
+			</MovingDisplay>
+			<div class="road"></div>
 		</Container>
 	);
 }
 
-const Container = styled.div`
-	display: flex;
-	height: ${({ height }) => (height ? "70px" : "100vh")};
-
-	justify-content: center;
-	align-items: center;
-	transition: height 1s linear;
-`;
-
 const Moving = styled.div`
-	transform: translateY(100px);
 	@keyframes moving_left {
 		0% {
 			transform: translate(240px, -100px);
@@ -68,44 +46,71 @@ const Moving = styled.div`
 			transform: translate(20px, 0px);
 		}
 		100% {
-			transform: translateX(0px);
+			transform: translate(0px, 0px);
 		}
 	}
-	${({ play }) => play && "animation: moving_left 5s linear;"});
+	animation: moving_left 3s linear;
+`;
+
+const StationaryPolygon = styled(PolygonIcon)`
+	fill: ${({ loadLanding }) => (!loadLanding ? "var(--puce)" : "black")};
+	transition: fill 2s linear;
 `;
 
 const Polygon = styled(PolygonIcon)`
 	@keyframes rotating {
-		0 {
-			transform: rotate(360deg);
-		}
-		70% {
+		0% {
 			transform: rotate(0deg);
 		}
-		100 {
-			transform: rotate(-1deg);
+		20% {
+			transform: rotate(-360deg);
+		}
+		40% {
+			transform: rotate(-720deg);
+		}
+		80% {
+			transform: rotate(-1080deg);
+		}
+		100% {
+			transform: rotate(-1080deg);
 		}
 	}
-
-	animation: rotating 3s linear infinite;
+	// fill: ${({ loadLanding }) => (!loadLanding ? "var(--puce)" : "black")};
+	transform-origin: center center;
+	animation: rotating 2s linear;
 `;
 
 const Title = styled.div`
 	text-align: center;
 	font-size: 30px;
 	font-weight: 700;
-	color: var(--purple);
-	opacity: ${({ height }) => (height ? "1" : "0")};
+	color: ${({ loadLanding }) =>
+		!loadLanding ? "var(--puce)" : "var(--purple)"};
+	opacity: ${({ loadLanding }) => (!loadLanding ? "1" : "0")};
 	padding: 8px 15px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 `;
 
-const Display = styled.div`
+const MovingDisplay = styled.div`
 	display: flex;
-	opacity: ${({ height }) => (height ? "1" : "0")};
-	${({ height }) => !height && "width: 0;"}
-	transition: opacity 1s linear;
-	padding: 8px 15px;
+	transition: opacity 0.3s linear;
+`;
+
+const Container = styled.div`
+	display: flex;
+	flex-direction: column;
+	height: ${({ loadLanding }) => (!loadLanding ? "70px" : "100vh")};
+	background: ${({ loadLanding }) =>
+		!loadLanding ? "#1b263b" : "transparent"};
+	justify-content: center;
+	align-items: center;
+	transition: height 2s linear, background 2s linear;
+	.road {
+		height: 15px;
+		width: ${({ loadLanding }) => (!loadLanding ? "100%" : "500px")};
+		background: black;
+		transition: width 0.5s linear;
+	}
 `;
