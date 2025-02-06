@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export default function Footer() {
-	return <Container>@houchongchan@gmail.com</Container>;
+	return <Container>@2025</Container>;
 }
 
 const Container = styled.div`

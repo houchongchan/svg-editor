@@ -44,51 +44,63 @@ export default function Controls({
 
 	return (
 		<Container>
-			<Section>
-				<SmallButton>
-					<Expand />
-				</SmallButton>
-				<Label disabled={uploading}>
-					<Upload />
-					<Button>
-						<Input
-							accept="image/*, */jpeg, */jpg, .jpg, .jpeg"
-							type="file"
-							name="image"
-							onChange={uploadImage}
-						/>
-					</Button>
-				</Label>
-				<SmallButton onClick={() => downloadImage()}>
-					<Download />
-				</SmallButton>
-			</Section>
-			<Toolbar>
-				<AddButton
-					onClick={() => updateAddMode("box")}
-					selected={addMode === "box"}
-				>
-					<Box />
-				</AddButton>
-				<AddButton
-					onClick={() => updateAddMode("line")}
-					selected={addMode === "line"}
-				>
-					<Line />
-				</AddButton>
-				<AddButton
-					onClick={() => updateAddMode("text")}
-					selected={addMode === "text"}
-				>
-					T
-				</AddButton>
-				<AddButton
-					onClick={() => updateAddMode("circle")}
-					selected={addMode === "circle"}
-				>
-					<Circle />
-				</AddButton>
-			</Toolbar>
+			<Top>
+				<Section>
+					<SmallButton>
+						<Expand />
+					</SmallButton>
+					<Label disabled={uploading}>
+						<Upload />
+						<Button>
+							<Input
+								accept="image/*, */jpeg, */jpg, .jpg, .jpeg"
+								type="file"
+								name="image"
+								onChange={uploadImage}
+							/>
+						</Button>
+						Replace Image
+					</Label>
+					<SmallButton onClick={() => downloadImage()}>
+						<Download /> Download Image
+					</SmallButton>
+				</Section>
+				<Toolbar>
+					<AddButton
+						onClick={() => updateAddMode("box")}
+						selected={addMode === "box"}
+					>
+						<Box /> Add Box
+					</AddButton>
+					<AddButton
+						onClick={() => updateAddMode("line")}
+						selected={addMode === "line"}
+					>
+						<Line /> Add Line
+					</AddButton>
+					<AddButton
+						onClick={() => updateAddMode("text")}
+						selected={addMode === "text"}
+					>
+						Add Text
+					</AddButton>
+					<AddButton
+						onClick={() => updateAddMode("circle")}
+						selected={addMode === "circle"}
+					>
+						<Circle /> Add Circle
+					</AddButton>
+				</Toolbar>
+			</Top>
+			<About>
+				<P size={16}>About </P>
+
+				<L size={14}>By: Hou chong chan</L>
+				<L size={14}>
+					Link to the project on
+					<a href="https://github.com/houchongchan/svg-editor"> Github</a>
+				</L>
+			</About>
 		</Container>
 	);
 }
@@ -96,11 +108,13 @@ export default function Controls({
 const Label = styled.label`
 	cursor: pointer;
 	display: flex;
-	padding: 5px 20px;
+	padding: 5px 15px;
 	border-radius: 4px;
-	justify-content: center;
+	justify-content: flex-start;
 	align-items: center;
 	background: var(--deepblue);
+	gap: 3px;
+	color: var(--magenta);
 
 	svg {
 		fill: var(--magenta);
@@ -126,6 +140,10 @@ const Input = styled.input`
 	display: none;
 `;
 
+const Top = styled.div`
+	width: 100%;
+`;
+
 const Button = styled.div`
 	font-family: var(--font-family);
 	font-size: var(--font-size-m);
@@ -140,10 +158,10 @@ const Button = styled.div`
 const Container = styled.div`
 	display: flex;
 	flex-direction: column;
-	justify-content: flex-start;
+	justify-content: space-between;
 	align-items: center;
 	z-index: 100;
-	padding: 10px 3px;
+	padding: 10px 3px 3px 3px;
 	background: #4c4b63;
 `;
 
@@ -164,7 +182,7 @@ const Section = styled.div`
 `;
 
 const AddButton = styled.div`
-	width: 40px;
+	width: 100%;
 	height: 40px;
 	background: ${({ selected }) =>
 		selected ? "var(--lightpurp)" : "var(--rosy)"};
@@ -185,12 +203,14 @@ const SmallButton = styled.div`
 	display: flex;
 	padding: 5px 20px;
 	border-radius: 4px;
-	justify-content: space-between;
+	justify-content: flex-start;
 	z-index: 100;
 	cursor: pointer;
 	display: flex;
-	justify-content: center;
 	align-items: center;
+	gap: 6px;
+	color: var(--magenta);
+	padding: 5px 15px;
 
 	background: var(--deepblue);
 
@@ -205,4 +225,24 @@ const SmallButton = styled.div`
 			fill: var(--rosy);
 		}
 	}
+`;
+
+const About = styled.div`
+	width: 100%;
+	background: lightgrey;
+	border-radius: 6px;
+	padding: 5px 8px;
+	box-shadow: rgba(16, 10, 9, 0.15) 0px 1px 2px;
+`;
+
+const P = styled.div`
+	font-size: ${({ size }) => size}px;
+	padding: 3px 4px;
+	color: var(--purple);
+	font-weight: 800;
+`;
+
+const L = styled.div`
+	font-size: ${({ size }) => size}px;
+	padding: 0px 2px;
 `;
